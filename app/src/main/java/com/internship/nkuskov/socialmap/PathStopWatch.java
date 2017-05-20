@@ -96,15 +96,6 @@ public class PathStopWatch extends AsyncTask<Void, Void, Void> {
         }
     }
 
-//    public static double distanceBetween(Location firstLocation, Location secondLocation) {
-//
-//        double firstLat = Math.toDegrees(firstLocation.getLatitude());
-//        double firstLng = Math.toDegrees(firstLocation.getLongitude());
-//        double secondLat = Math.toDegrees(secondLocation.getLatitude());
-//        double secondLng = Math.toDegrees(secondLocation.getLongitude());
-//
-//        return Math.round(6371210 * Math.acos(Math.cos(firstLat) * Math.cos(secondLat) * Math.cos(firstLng - secondLng) + Math.sin(firstLat) * Math.sin(secondLat)));
-//    }
 
     @Override
     protected void onPreExecute() {
@@ -122,7 +113,7 @@ public class PathStopWatch extends AsyncTask<Void, Void, Void> {
         mHandler.sendEmptyMessage(MSG_START_TIMER);
         do {
             distance = stopLocation.distanceTo(mMapsActivity.mLastLocation);
-            if (isCancelled()){
+            if (isCancelled()) {
                 return null;
             }
         } while (distance >= 50.0f);

@@ -19,6 +19,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -45,9 +46,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -72,6 +76,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     PathStopWatch pathStopWatch = null;
     FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    FirebaseUser mUser;
+    FirebaseDatabase database;
+    DatabaseReference myRef;
 
 
     final static int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
@@ -92,6 +99,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fireBaseLogin = (TextView) findViewById(R.id.firebase_login);
         mPathCreator = new PathCreator(this);
         mAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference();
+        mUser = mAuth.getCurrentUser();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -287,6 +297,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startActivity(fireBaseAuth);
     }
 
+    public void fireDatabase(View view){
+        myRef.child(mUser.getUid());
+        myRef = database.getReference(mUser.getUid());
+        myRef.setValue(new DatabaseUser(new ArrayList<String>(),new DatabaseLocation(mLastLocation.getLatitude(),mLastLocation.getLongitude())));
+        myRef.child("Place1").setValue(new DatabasePlaces("",new ArrayList<Integer>()));
+    }
 
     public void chooseLocationButton(View view) {
         if (!isOnline()) {
