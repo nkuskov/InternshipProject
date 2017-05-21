@@ -93,7 +93,7 @@ public class FireBaseLoginActivity extends AppCompatActivity implements OnClickL
                     mUser = mAuth.getCurrentUser();
                     mFirebaseDatabase = FirebaseDatabase.getInstance();
                     mRef = mFirebaseDatabase.getReference();
-                    mRef.child(mUser.getUid());
+                    mRef.child(mUser.getUid()).child("currentLocation").setValue(new DatabaseLocation(0,0));
 
                 } else
                     Toast.makeText(FireBaseLoginActivity.this, "Регистрация провалена", Toast.LENGTH_SHORT).show();
