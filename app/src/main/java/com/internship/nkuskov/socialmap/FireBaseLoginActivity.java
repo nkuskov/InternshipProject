@@ -15,6 +15,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 public class FireBaseLoginActivity extends AppCompatActivity implements OnClickListener {
@@ -24,6 +26,11 @@ public class FireBaseLoginActivity extends AppCompatActivity implements OnClickL
 
     private EditText ETemail;
     private EditText ETpassword;
+
+    private DatabaseReference mRef;
+    private FirebaseDatabase mFirebaseDatabase;
+    private FirebaseUser mUser;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +90,11 @@ public class FireBaseLoginActivity extends AppCompatActivity implements OnClickL
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     Toast.makeText(FireBaseLoginActivity.this, "Регистрация успешна", Toast.LENGTH_SHORT).show();
+                    mUser = mAuth.getCurrentUser();
+                    mFirebaseDatabase = FirebaseDatabase.getInstance();
+                    mRef = mFirebaseDatabase.getReference();
+                    mRef.child(mUser.getUid());
+
                 } else
                     Toast.makeText(FireBaseLoginActivity.this, "Регистрация провалена", Toast.LENGTH_SHORT).show();
             }

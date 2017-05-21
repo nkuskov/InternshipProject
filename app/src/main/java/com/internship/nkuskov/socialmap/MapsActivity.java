@@ -57,27 +57,36 @@ import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
-    Intent fireBaseAuth;
     GoogleMap mMap;
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
+    Location sourceLocation;
+    Location stopLocation;
     Marker mMarker;
     Geocoder mGeocoder;
     List<Address> mAddressList = null;
+
     TextView currentLocation;
     TextView currentSpeed;
     TextView currentTime;
     TextView fireBaseLogin;
+
     double speed;
     Place place;
     Intent intent;
     PathCreator mPathCreator;
     PathStopWatch pathStopWatch = null;
+    Stopwatch timer;
+    boolean startStopWatchFlag = false;
+    boolean stopStopWatchFlag = false;
+    boolean updateStopWatchFlag = false;
+
+    Intent fireBaseAuth;
     FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     FirebaseUser mUser;
-    FirebaseDatabase database;
+    FirebaseDatabase mFirebaseDatabase;
     DatabaseReference myRef;
 
 
@@ -99,9 +108,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fireBaseLogin = (TextView) findViewById(R.id.firebase_login);
         mPathCreator = new PathCreator(this);
         mAuth = FirebaseAuth.getInstance();
-        database = FirebaseDatabase.getInstance();
-        myRef = database.getReference();
         mUser = mAuth.getCurrentUser();
+        if (mUser != null) {
+            mFirebaseDatabase = FirebaseDatabase.getInstance();
+            myRef = mFirebaseDatabase.getReference();
+        }
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -110,7 +121,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (user != null) {
                     fireBaseLogin.setText(user.getEmail());
                 } else {
-                    fireBaseLogin.setText(user.getEmail());
+
                 }
             }
         };
@@ -189,32 +200,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mGoogleApiClient.connect();
     }
 
+    public void startStopWatch() {
+        double distance = sourceLocation.distanceTo(mLastLocation);
+        timer = new Stopwatch();
+        if (distance >= 50.0f) {
+            this.updateStopWatchFlag = true;
+            this.stopStopWatchFlag = true;
+            this.startStopWatchFlag = false;
+            timer.start();
+        }
+    }
+
+    public void stopStopWatch() {
+        double distance = mLastLocation.distanceTo(stopLocation);
+        if (distance <= 50.0f) {
+            timer.stop();
+            this.updateStopWatchFlag = false;
+            this.startStopWatchFlag = false;
+        }
+    }
+
+    public void updateStopWatch() {
+        currentTime.setText(getStopWatchText(timer.getElapsedTime()));
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
+        updateUI();
 
-        if (mMarker != null) {
-            mMarker.remove();
+        if (startStopWatchFlag) {
+            startStopWatch();
         }
 
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-        if (isOnline()) {
-            try {
-                mAddressList = mGeocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                if (mAddressList != null) {
-                    currentLocation.setText("Location: " + mAddressList.get(0).getAddressLine(0));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (updateStopWatchFlag) {
+            updateStopWatch();
         }
 
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        mMarker = mMap.addMarker(markerOptions);
-        speed = location.getSpeed() * 18 / 5;
-        currentSpeed.setText("Speed: " + new DecimalFormat("#.##").format(speed) + " km/h");
+        if (stopStopWatchFlag) {
+            stopStopWatch();
+        }
 
     }
 
@@ -292,16 +317,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public void authFireBase(View view){
-        fireBaseAuth = new Intent(this,FireBaseLoginActivity.class);
+    public void authFireBase(View view) {
+        fireBaseAuth = new Intent(this, FireBaseLoginActivity.class);
         startActivity(fireBaseAuth);
     }
 
-    public void fireDatabase(View view){
-        myRef.child(mUser.getUid());
-        myRef = database.getReference(mUser.getUid());
-        myRef.setValue(new DatabaseUser(new ArrayList<String>(),new DatabaseLocation(mLastLocation.getLatitude(),mLastLocation.getLongitude())));
-        myRef.child("Place1").setValue(new DatabasePlaces("",new ArrayList<Integer>()));
+    public void fireDatabase(View view) {
+        myRef = mFirebaseDatabase.getReference(mUser.getUid());
+        myRef.setValue(new DatabaseUser(new ArrayList<String>(), new DatabaseLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
+        myRef.child("Place1").setValue(new DatabasePlaces("", new ArrayList<Integer>()));
     }
 
     public void chooseLocationButton(View view) {
@@ -332,6 +356,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    public void updateUI() {
+        if (mMarker != null) {
+            mMarker.remove();
+        }
+
+        LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+        if (isOnline()) {
+            try {
+                mAddressList = mGeocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                if (mAddressList != null) {
+                    currentLocation.setText("Location: " + mAddressList.get(0).getAddressLine(0));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (mUser != null) {
+                myRef = mFirebaseDatabase.getReference(mUser.getUid());
+                myRef.child("currentLocation").setValue(new DatabaseLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            }
+        }
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        mMarker = mMap.addMarker(markerOptions);
+        speed = mLastLocation.getSpeed() * 18 / 5;
+        currentSpeed.setText("Speed: " + new DecimalFormat("#.##").format(speed) + " km/h");
+
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (pathStopWatch != null) {
@@ -341,9 +397,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 place = PlaceAutocomplete.getPlace(this, data);
+                sourceLocation = mLastLocation;
+                stopLocation = new Location("");
+                stopLocation.setLongitude(place.getLatLng().longitude);
+                stopLocation.setLatitude(place.getLatLng().latitude);
+
                 mPathCreator.makeURL(mLastLocation.getLatitude(), mLastLocation.getLongitude(), place.getLatLng().latitude, place.getLatLng().longitude);
-                pathStopWatch = new PathStopWatch(mLastLocation, place, this);
-                pathStopWatch.execute();
+                this.startStopWatchFlag = true;
+//                pathStopWatch = new PathStopWatch(mLastLocation, place, this);
+//                pathStopWatch.execute();
             } else if (requestCode == RESULT_CANCELED) {
             }
         }
@@ -354,6 +416,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnected();
+    }
+
+    private class Stopwatch {
+        private long startTime = 0;
+        private long stopTime = 0;
+        private boolean running = false;
+
+        public void start() {
+            this.startTime = System.currentTimeMillis();
+            this.running = true;
+        }
+
+        public void stop() {
+            this.stopTime = System.currentTimeMillis();
+            this.running = false;
+        }
+
+        public long getElapsedTime() {
+            if (running) {
+                return System.currentTimeMillis() - startTime;
+            }
+            return stopTime - startTime;
+        }
+
+
+    }
+
+    public static String getStopWatchText(long timeInMs) {
+        long hours = timeInMs / (1000 * 60 * 60);
+        long minutes = (timeInMs / (1000 * 60)) % 60;
+        long seconds = (timeInMs / (1000)) % 60;
+
+        String minutesSeconds;
+        if (seconds < 10) {
+            minutesSeconds = "" + minutes + ":0" + seconds;
+        } else {
+            minutesSeconds = "" + minutes + ":" + seconds;
+        }
+
+        if (hours != 0) {
+            return "" + hours + ":" + minutesSeconds;
+        } else {
+            return minutesSeconds;
+        }
     }
 
 }
