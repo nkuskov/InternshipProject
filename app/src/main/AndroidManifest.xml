@@ -47,6 +47,10 @@
             android:label="@string/title_activity_fire_base_login"
             android:parentActivityName=".MapsActivity">
         </activity>
+        <activity
+            android:name=".DestinationList"
+            android:parentActivityName=".MapsActivity">
+        </activity>
     </application>
 
 </manifest>

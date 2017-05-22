@@ -67,6 +67,12 @@
             android:text="Database"
             />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="destListButton"
+            android:text="DestList"/>
+
         <TextView
             android:id="@+id/firebase_login"
             android:layout_width="wrap_content"

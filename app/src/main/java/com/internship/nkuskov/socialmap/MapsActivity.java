@@ -109,6 +109,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mPathCreator = new PathCreator(this);
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
+        
         if (mUser != null) {
             mFirebaseDatabase = FirebaseDatabase.getInstance();
             myRef = mFirebaseDatabase.getReference();
@@ -323,9 +324,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void fireDatabase(View view) {
-        myRef = mFirebaseDatabase.getReference(mUser.getUid());
-        myRef.setValue(new DatabaseUser(new ArrayList<String>(), new DatabaseLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
-        myRef.child("Place1").setValue(new DatabasePlaces("", new ArrayList<Integer>()));
+        myRef = mFirebaseDatabase.getReference().child(mUser.getUid());
+        myRef.child("DestList").push().setValue("abc");
+    }
+
+    public void destListButton(View view){
+        Intent intent = new Intent(this, DestinationList.class);
+        startActivity(intent);
     }
 
     public void chooseLocationButton(View view) {
