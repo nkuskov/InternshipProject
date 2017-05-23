@@ -51,6 +51,7 @@
             android:name=".DestinationList"
             android:parentActivityName=".MapsActivity">
         </activity>
+        <service android:name=".StopWatchService"/>
     </application>
 
 </manifest>

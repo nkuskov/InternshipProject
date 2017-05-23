@@ -69,18 +69,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     TextView currentLocation;
     TextView currentSpeed;
-    TextView currentTime;
+    static TextView currentTime;
     TextView fireBaseLogin;
 
     double speed;
     Place place;
     Intent intent;
+    Intent stopWatchService;
     PathCreator mPathCreator;
     PathStopWatch pathStopWatch = null;
-    Stopwatch timer;
     boolean startStopWatchFlag = false;
     boolean stopStopWatchFlag = false;
-    boolean updateStopWatchFlag = false;
 
     Intent fireBaseAuth;
     FirebaseAuth mAuth;
@@ -109,7 +108,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mPathCreator = new PathCreator(this);
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-        
+        stopWatchService = new Intent(this, StopWatchService.class);
+
         if (mUser != null) {
             mFirebaseDatabase = FirebaseDatabase.getInstance();
             myRef = mFirebaseDatabase.getReference();
@@ -203,26 +203,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void startStopWatch() {
         double distance = sourceLocation.distanceTo(mLastLocation);
-        timer = new Stopwatch();
         if (distance >= 50.0f) {
-            this.updateStopWatchFlag = true;
             this.stopStopWatchFlag = true;
             this.startStopWatchFlag = false;
-            timer.start();
+            startService(stopWatchService);
+
+
         }
     }
 
     public void stopStopWatch() {
         double distance = mLastLocation.distanceTo(stopLocation);
         if (distance <= 50.0f) {
-            timer.stop();
-            this.updateStopWatchFlag = false;
+            this.stopStopWatchFlag = false;
             this.startStopWatchFlag = false;
-        }
-    }
+            stopService(stopWatchService);
 
-    public void updateStopWatch() {
-        currentTime.setText(getStopWatchText(timer.getElapsedTime()));
+        }
     }
 
     @Override
@@ -232,10 +229,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (startStopWatchFlag) {
             startStopWatch();
-        }
-
-        if (updateStopWatchFlag) {
-            updateStopWatch();
         }
 
         if (stopStopWatchFlag) {
@@ -406,11 +399,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 stopLocation = new Location("");
                 stopLocation.setLongitude(place.getLatLng().longitude);
                 stopLocation.setLatitude(place.getLatLng().latitude);
-
+                stopService(stopWatchService);
                 mPathCreator.makeURL(mLastLocation.getLatitude(), mLastLocation.getLongitude(), place.getLatLng().latitude, place.getLatLng().longitude);
                 this.startStopWatchFlag = true;
-//                pathStopWatch = new PathStopWatch(mLastLocation, place, this);
-//                pathStopWatch.execute();
             } else if (requestCode == RESULT_CANCELED) {
             }
         }
@@ -421,50 +412,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnected();
-    }
-
-    private class Stopwatch {
-        private long startTime = 0;
-        private long stopTime = 0;
-        private boolean running = false;
-
-        public void start() {
-            this.startTime = System.currentTimeMillis();
-            this.running = true;
-        }
-
-        public void stop() {
-            this.stopTime = System.currentTimeMillis();
-            this.running = false;
-        }
-
-        public long getElapsedTime() {
-            if (running) {
-                return System.currentTimeMillis() - startTime;
-            }
-            return stopTime - startTime;
-        }
-
-
-    }
-
-    public static String getStopWatchText(long timeInMs) {
-        long hours = timeInMs / (1000 * 60 * 60);
-        long minutes = (timeInMs / (1000 * 60)) % 60;
-        long seconds = (timeInMs / (1000)) % 60;
-
-        String minutesSeconds;
-        if (seconds < 10) {
-            minutesSeconds = "" + minutes + ":0" + seconds;
-        } else {
-            minutesSeconds = "" + minutes + ":" + seconds;
-        }
-
-        if (hours != 0) {
-            return "" + hours + ":" + minutesSeconds;
-        } else {
-            return minutesSeconds;
-        }
     }
 
 }

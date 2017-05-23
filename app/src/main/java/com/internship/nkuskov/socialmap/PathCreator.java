@@ -95,6 +95,8 @@ public class PathCreator implements Serializable {
             String encodedString = overviewPolylines.getString("points");
             List<LatLng> list = decodePoly(encodedString);
             Random rand = new Random();
+            
+            line.getPoints().toArray();
             line = mMapsActivity.mMap.addPolyline(new PolylineOptions()
                     .addAll(list)
                     .width(12)
