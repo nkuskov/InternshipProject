@@ -1,4 +1,7 @@
 <resources>
+    <string name="facebook_app_id">261582554308521</string>
+    <string name="fb_login_protocol_scheme">fb261582554308521</string>
+
     <string name="app_name">MapGps</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_navigation">NavigationActivity</string>

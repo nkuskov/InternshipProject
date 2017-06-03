@@ -25,6 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static com.internship.nkuskov.socialmap.MapsActivity.getUserPathPolyline;
+import static com.internship.nkuskov.socialmap.MapsActivity.setUserPathPolyline;
+
 /**
  * Class for creating Path between two points on Google Map. By parsing JSON file with polylines.
  * Created by nkuskov on 4/27/2017.
@@ -79,8 +82,8 @@ public class PathCreator implements Serializable {
      * @param path
      */
     public void drawPath(String path) {
-        if (line != null) {
-            line.remove();
+        if (getUserPathPolyline() != null) {
+            getUserPathPolyline().remove();
         }
         if (mMarker != null) {
             mMarker.remove();
@@ -95,13 +98,12 @@ public class PathCreator implements Serializable {
             String encodedString = overviewPolylines.getString("points");
             List<LatLng> list = decodePoly(encodedString);
             Random rand = new Random();
-            
-            line.getPoints().toArray();
             line = mMapsActivity.mMap.addPolyline(new PolylineOptions()
                     .addAll(list)
                     .width(12)
                     .color(Color.rgb(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255)))
                     .geodesic(true));
+            setUserPathPolyline(line);
 
             mMarker = mMapsActivity.mMap.addMarker(new MarkerOptions().position(list.get(list.size() - 1)));
 

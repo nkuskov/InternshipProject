@@ -5,10 +5,16 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -17,6 +23,7 @@ import com.google.android.gms.location.LocationListener;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
@@ -27,6 +34,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 
 import android.content.DialogInterface.OnClickListener;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,12 +53,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,17 +73,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     GoogleMap mMap;
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
+    static Location mLastLocation;
     Location sourceLocation;
     Location stopLocation;
     Marker mMarker;
     Geocoder mGeocoder;
+    List<LatLng> userPathLatLng;
     List<Address> mAddressList = null;
+    private static Polyline userPathPolyline;
 
-    TextView currentLocation;
-    TextView currentSpeed;
+    static TextView currentLocation;
+    static TextView currentSpeed;
     static TextView currentTime;
-    TextView fireBaseLogin;
+    static TextView fireBaseLogin;
 
     double speed;
     Place place;
@@ -92,6 +107,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     final static int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     public static final int MY_PERMISSION_REQUEST = 99;
 
+    public static Polyline getUserPathPolyline() {
+        return userPathPolyline;
+    }
+
+    public static void setUserPathPolyline(Polyline userPathPolyline) {
+        MapsActivity.userPathPolyline = userPathPolyline;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,6 +128,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         currentSpeed = (TextView) findViewById(R.id.current_speed);
         currentTime = (TextView) findViewById(R.id.current_time);
         fireBaseLogin = (TextView) findViewById(R.id.firebase_login);
+
         mPathCreator = new PathCreator(this);
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -120,13 +144,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    fireBaseLogin.setText(user.getEmail());
+                    fireBaseLogin.setText(user.getDisplayName());   
                 } else {
 
                 }
             }
         };
-
 
         Thread.setDefaultUncaughtExceptionHandler(new CustomizedExceptionHandler("/mnt/sdcard/"));
     }
@@ -179,6 +202,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        if (userPathLatLng != null) {
+            userPathPolyline = mMap.addPolyline(new PolylineOptions()
+                    .addAll(userPathLatLng)
+                    .width(12)
+                    .color(Color.rgb(200, 200, 200))
+                    .geodesic(true));
+        }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -321,7 +352,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myRef.child("DestList").push().setValue("abc");
     }
 
-    public void destListButton(View view){
+    public void destListButton(View view) {
         Intent intent = new Intent(this, DestinationList.class);
         startActivity(intent);
     }
@@ -412,6 +443,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnected();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("currentLocation", currentLocation.getText().toString());
+        outState.putString("currentSpeed", currentSpeed.getText().toString());
+        if (userPathPolyline != null) {
+            outState.putParcelableArrayList("userPathLatLng", (ArrayList<? extends Parcelable>) userPathPolyline.getPoints());
+        }
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        currentLocation.setText(savedInstanceState.getString("currentLocation"));
+        currentSpeed.setText(savedInstanceState.getString("currentSpeed"));
+        userPathLatLng = savedInstanceState.getParcelableArrayList("userPathLatLng");
+
     }
 
 }

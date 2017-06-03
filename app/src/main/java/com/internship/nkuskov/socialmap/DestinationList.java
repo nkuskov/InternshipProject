@@ -1,12 +1,17 @@
 package com.internship.nkuskov.socialmap;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -61,6 +66,25 @@ public class DestinationList extends AppCompatActivity {
 
 
         destList.setAdapter(mAdapter);
+        destList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                new AlertDialog.Builder(DestinationList.this)
+                        .setTitle("Internet connection needed")
+                        .setMessage(destList.getItemAtPosition(position).toString())
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case Dialog.BUTTON_POSITIVE:
+                                        break;
+                                }
+                            }
+                        })
+                        .create()
+                        .show();
+            }
+        });
 
     }
 }
