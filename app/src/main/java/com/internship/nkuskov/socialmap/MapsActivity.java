@@ -96,6 +96,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean startStopWatchFlag = false;
     boolean stopStopWatchFlag = false;
 
+    private String headForDatabase;
     Intent fireBaseAuth;
     FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -124,7 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         mGeocoder = new Geocoder(this, Locale.getDefault());
-        currentLocation = (TextView) findViewById(R.id.current_location);
+        currentLocation = (TextView) findViewById(R.id.bottom_sheet_location);
         currentSpeed = (TextView) findViewById(R.id.current_speed);
         currentTime = (TextView) findViewById(R.id.current_time);
         fireBaseLogin = (TextView) findViewById(R.id.firebase_login);
@@ -132,6 +133,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mPathCreator = new PathCreator(this);
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
+        getHeadForDatabase();
+
+
         stopWatchService = new Intent(this, StopWatchService.class);
 
         if (mUser != null) {
@@ -142,21 +146,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    if(user.getDisplayName()!=null){
-                        fireBaseLogin.setText(user.getDisplayName());
-                    }  else {
-                        fireBaseLogin.setText("NoName");
-                    }
-
-                } else {
-
-                }
+                fireBaseLogin.setText(headForDatabase);
             }
         };
 
         Thread.setDefaultUncaughtExceptionHandler(new CustomizedExceptionHandler("/mnt/sdcard/"));
+    }
+
+    private void getHeadForDatabase() {
+        if (mUser != null) {
+            if (mUser.getDisplayName() != null) {
+                headForDatabase = mUser.getDisplayName();
+            } else {
+                headForDatabase = mUser.getEmail();
+            }
+        }
     }
 
     @Override
