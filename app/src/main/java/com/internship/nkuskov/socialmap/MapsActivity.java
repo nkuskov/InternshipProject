@@ -144,7 +144,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    fireBaseLogin.setText(user.getDisplayName());   
+                    if(user.getDisplayName()!=null){
+                        fireBaseLogin.setText(user.getDisplayName());
+                    }  else {
+                        fireBaseLogin.setText("NoName");
+                    }
+
                 } else {
 
                 }
