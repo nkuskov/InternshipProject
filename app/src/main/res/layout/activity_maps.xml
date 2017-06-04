@@ -2,6 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center"
     android:background="#14ffffff"
     android:orientation="vertical">
 
@@ -14,18 +15,10 @@
               android:layout_height="match_parent"
               tools:context="com.example.nkuskov.mapgps.MapsActivity"/>
 
-    <!--<TextView-->
-        <!--android:id="@+id/current_location"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentStart="true"-->
-        <!--android:textSize="27sp"/>-->
-
     <LinearLayout
-        android:gravity="center_horizontal"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:gravity="center_horizontal"
         android:orientation="horizontal">
 
         <TextView
@@ -33,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:layout_weight="1"
+            android:text="0km/h"
             android:textSize="27sp"/>
 
         <Button
@@ -46,23 +39,24 @@
 
         <TextView
             android:id="@+id/current_time"
-            android:text="0:00"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:text="0:00"
             android:textSize="27sp"/>
 
     </LinearLayout>
 
     <LinearLayout
-        android:layout_marginTop="70dp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="70dp"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/firebase_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="authFireBase"
@@ -70,7 +64,7 @@
 
         <Button
             android:id="@+id/firebase_database"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="fireDatabase"
@@ -78,19 +72,20 @@
             />
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:onClick="destListButton"
             android:text="DestList"/>
-
-        <TextView
-            android:id="@+id/firebase_login"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_weight="1"
-            android:textSize="27sp"/>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/firebase_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="110dp"
+        android:layout_weight="1"
+        android:textSize="27sp"/>
 
     <include layout="@layout/bottom_sheet"/>
 

@@ -4,47 +4,38 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
-
-
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.location.LocationListener;
-
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringDef;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-
-import android.content.DialogInterface.OnClickListener;
-import android.util.Base64;
-import android.util.Log;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -52,17 +43,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.internship.nkuskov.socialmap.RecyclerView.*;
+
+
 
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +71,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Geocoder mGeocoder;
     List<LatLng> userPathLatLng;
     List<Address> mAddressList = null;
+    private List<RecyclerListItem> mDestinationItems;
     private static Polyline userPathPolyline;
+    private GridLayoutManager mGridLayoutManager;
 
     static TextView currentLocation;
     static TextView currentSpeed;
@@ -98,10 +91,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private String headForDatabase;
     Intent fireBaseAuth;
-    FirebaseAuth mAuth;
+    static FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     FirebaseUser mUser;
-    FirebaseDatabase mFirebaseDatabase;
+    static FirebaseDatabase mFirebaseDatabase;
     DatabaseReference myRef;
 
 
@@ -130,25 +123,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         currentTime = (TextView) findViewById(R.id.current_time);
         fireBaseLogin = (TextView) findViewById(R.id.firebase_login);
 
+        stopWatchService = new Intent(this, StopWatchService.class);
         mPathCreator = new PathCreator(this);
+
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         getHeadForDatabase();
-
-
-        stopWatchService = new Intent(this, StopWatchService.class);
-
         if (mUser != null) {
             mFirebaseDatabase = FirebaseDatabase.getInstance();
             myRef = mFirebaseDatabase.getReference();
         }
-
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 fireBaseLogin.setText(headForDatabase);
             }
         };
+
+        //Initialize RecyclerView
+        initializeDestinationItems();
+        mGridLayoutManager = new GridLayoutManager(MapsActivity.this,6);
+        RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(mDestinationItems);
+        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.dest_recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(mGridLayoutManager);
+        recyclerView.setAdapter(recyclerViewAdapter);
+
 
         Thread.setDefaultUncaughtExceptionHandler(new CustomizedExceptionHandler("/mnt/sdcard/"));
     }
@@ -405,7 +405,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             try {
                 mAddressList = mGeocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
                 if (mAddressList != null) {
-                    currentLocation.setText("Location: " + mAddressList.get(0).getAddressLine(0));
+                    currentLocation.setText(mAddressList.get(0).getAddressLine(0));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -421,7 +421,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         markerOptions.position(latLng);
         mMarker = mMap.addMarker(markerOptions);
         speed = mLastLocation.getSpeed() * 18 / 5;
-        currentSpeed.setText("Speed: " + new DecimalFormat("#.##").format(speed) + " km/h");
+        currentSpeed.setText(new DecimalFormat("#.##").format(speed) + " km/h");
 
 
     }
@@ -471,6 +471,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         currentLocation.setText(savedInstanceState.getString("currentLocation"));
         currentSpeed.setText(savedInstanceState.getString("currentSpeed"));
         userPathLatLng = savedInstanceState.getParcelableArrayList("userPathLatLng");
+
+    }
+
+    private void initializeDestinationItems(){
+        mDestinationItems = new ArrayList<>();
+        mDestinationItems.add(new DestinationAddButton());
+        mDestinationItems.add(new DestinationItem("Work",R.drawable.dest_icon_img));
+        mDestinationItems.add(new DestinationItem("home",R.drawable.dest_icon_img));
 
     }
 

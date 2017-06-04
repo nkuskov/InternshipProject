@@ -33,7 +33,7 @@ import static com.internship.nkuskov.socialmap.MapsActivity.setUserPathPolyline;
  * Created by nkuskov on 4/27/2017.
  */
 
-public class PathCreator implements Serializable {
+public class PathCreator {
 
     Marker mMarker = null;
     Polyline line;
