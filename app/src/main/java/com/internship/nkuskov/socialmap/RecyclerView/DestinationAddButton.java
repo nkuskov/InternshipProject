@@ -7,7 +7,7 @@ import com.internship.nkuskov.socialmap.R;
  */
 
 public class DestinationAddButton implements RecyclerListItem {
-    private String buttonText = "Add new Destination";
+    private String buttonText = "ADD";
     private int iconId = R.drawable.dest_icon_img;
 
     @Override
