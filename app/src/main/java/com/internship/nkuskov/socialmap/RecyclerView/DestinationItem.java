@@ -17,6 +17,11 @@ public class DestinationItem implements RecyclerListItem {
         this.longitude = longitude;
     }
 
+    public DestinationItem(String destName,int destIconId){
+        this.destName = destName;
+        this.destIconId = destIconId;
+    }
+
     @Override
     public int getRecyclerListItemType() {
         return RecyclerListItem.destinationItem;

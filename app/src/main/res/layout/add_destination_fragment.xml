@@ -1,20 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/add_destination_window"
-              android:orientation="vertical"
-              android:layout_width="300dp"
-              android:layout_height="100dp">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/add_destination_window"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:background="@color/blue_800"
+                android:gravity="center_horizontal">
 
+    <Button
+        android:id="@+id/close_fragment_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:onClick="deleteAddDestionationFragmentButton"
+        android:text="delete"/>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/edTextFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/close_fragment_btn"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:text="Fragment"
+        android:textSize="25dp"/>
 
-        <GridLayout
-            android:columnCount="4"
+    <LinearLayout
+        android:id="@+id/auto_complete_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edTextFragment"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical">
+
+        <AutoCompleteTextView
+            android:id="@+id/auto_complete_text_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:text="Please enter your place"/>
 
-        </GridLayout>
-    </ScrollView>
-</LinearLayout>
+        <requestFocus/>
+
+    </LinearLayout>
+
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/edTextFragment"-->
+    <!--android:layout_centerHorizontal="true">-->
+
+    <!--<fragment-->
+    <!--android:id="@+id/place_autocomplete_fragment"-->
+    <!--android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center"/>-->
+
+    <!--</LinearLayout>-->
+
+
+</RelativeLayout>

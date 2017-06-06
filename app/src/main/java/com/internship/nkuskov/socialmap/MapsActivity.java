@@ -19,6 +19,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
@@ -49,9 +51,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.internship.nkuskov.socialmap.RecyclerView.*;
-
-
+import com.internship.nkuskov.socialmap.Fragments.AddNewDestinationFragment;
+import com.internship.nkuskov.socialmap.RecyclerView.DestinationAddButton;
+import com.internship.nkuskov.socialmap.RecyclerView.DestinationItem;
+import com.internship.nkuskov.socialmap.RecyclerView.RecyclerListItem;
+import com.internship.nkuskov.socialmap.RecyclerView.RecyclerViewAdapter;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -74,6 +78,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<RecyclerListItem> mDestinationItems;
     private static Polyline userPathPolyline;
     private GridLayoutManager mGridLayoutManager;
+
+    private FragmentManager mFragmentManager;
+    private AddNewDestinationFragment mAddNewDestinationFragment;
+    private FragmentTransaction mFragmentTransaction;
 
     static TextView currentLocation;
     static TextView currentSpeed;
@@ -109,6 +117,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MapsActivity.userPathPolyline = userPathPolyline;
     }
 
+    public FragmentManager getmFragmentManager() {
+        return mFragmentManager;
+    }
+
+    public AddNewDestinationFragment getmAddNewDestinationFragment() {
+        return mAddNewDestinationFragment;
+    }
+
+    public FragmentTransaction getmFragmentTransaction() {
+        return mFragmentTransaction;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,6 +146,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         stopWatchService = new Intent(this, StopWatchService.class);
         mPathCreator = new PathCreator(this);
 
+        mFragmentManager = getSupportFragmentManager();
+        mAddNewDestinationFragment = new AddNewDestinationFragment();
+
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         getHeadForDatabase();
@@ -142,9 +165,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Initialize RecyclerView
         initializeDestinationItems();
-        mGridLayoutManager = new GridLayoutManager(MapsActivity.this,6);
-        RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(mDestinationItems);
-        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.dest_recycler_view);
+        mGridLayoutManager = new GridLayoutManager(MapsActivity.this, 6);
+        RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(this, mDestinationItems);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.dest_recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(mGridLayoutManager);
         recyclerView.setAdapter(recyclerViewAdapter);
@@ -474,12 +497,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void initializeDestinationItems(){
+    private void initializeDestinationItems() {
         mDestinationItems = new ArrayList<>();
         mDestinationItems.add(new DestinationAddButton());
-
-
+        mDestinationItems.add(new DestinationItem("work", R.drawable.dest_icon_img));
+        mDestinationItems.add(new DestinationItem("home", R.drawable.dest_icon_img));
     }
+
+
 
 }
 

@@ -3,8 +3,8 @@ package com.internship.nkuskov.socialmap.RecyclerView;
 import com.internship.nkuskov.socialmap.R;
 
 /**
- * Created by nkuskov on 6/5/2017.
- */
+ * Class for creating Add Button in RecyclerView
+ **/
 
 public class DestinationAddButton implements RecyclerListItem {
     private String buttonText = "ADD";

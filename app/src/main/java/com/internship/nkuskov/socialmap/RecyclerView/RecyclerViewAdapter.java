@@ -4,6 +4,7 @@ Class for filling in RecyclerView
 
 package com.internship.nkuskov.socialmap.RecyclerView;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
@@ -17,11 +18,15 @@ import java.util.List;
 public class RecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private List<RecyclerListItem> destinationItems;
+    private Context mContext;
 
-    public RecyclerViewAdapter(List<RecyclerListItem> destinationItems) {
+    public RecyclerViewAdapter(Context mContext ,List<RecyclerListItem> destinationItems) {
+        this.mContext = mContext;
         this.destinationItems = destinationItems;
+
     }
 
+    //getting write item model
     @Override
     public int getItemViewType(int position) {
         return destinationItems.get(position).getRecyclerListItemType();
@@ -32,9 +37,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_layout, null);
         switch (viewType) {
             case RecyclerListItem.destinationAddButton:
-                return new DestinationAddRecyclerView(v);
+                return new DestinationAddRecyclerView(mContext , v);
             case RecyclerListItem.destinationItem:
-                return new DestinationItemRecyclerView(v);
+                return new DestinationItemRecyclerView(mContext , v);
         }
         return null;
 

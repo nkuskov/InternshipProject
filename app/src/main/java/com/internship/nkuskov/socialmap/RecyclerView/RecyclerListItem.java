@@ -1,9 +1,8 @@
 package com.internship.nkuskov.socialmap.RecyclerView;
 
 /**
- * Created by nkuskov on 6/5/2017.
+ * interface for choosing write model class in RecycleViewAdapter
  */
-
 public interface RecyclerListItem {
     int destinationAddButton = 1;
     int destinationItem = 2;
