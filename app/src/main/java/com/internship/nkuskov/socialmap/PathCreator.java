@@ -17,7 +17,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -122,7 +121,7 @@ public class PathCreator {
     private List<LatLng> decodePoly(String encoded) {
 
         List<LatLng> poly = new ArrayList<>();
-        LatLng latLng = new LatLng(mMapsActivity.mLastLocation.getLatitude(), mMapsActivity.mLastLocation.getLongitude());
+        LatLng latLng = new LatLng(mMapsActivity.getmLastLocation().getLatitude(), mMapsActivity.getmLastLocation().getLongitude());
         poly.add(latLng);
         int index = 0;
         int len = encoded.length();

@@ -87,9 +87,11 @@ public class GooglePlacesAutocompleteAdapter extends ArrayAdapter implements Fil
         try {
             //Buiild an URL inquiry
             StringBuilder stringBuilder = new StringBuilder(PLACES_API_BASE + TYPE_AUTOCOMPLETE + OUT_JSON);
-            stringBuilder.append("?key=" + API_KEY);
-            stringBuilder.append("&components=country:gr");
-            stringBuilder.append("&input=" + URLEncoder.encode(input, "utf8"));
+            stringBuilder.append("?input=" + URLEncoder.encode(input, "utf8"));
+            stringBuilder.append("&location=");
+            stringBuilder.append(MapsActivity.getmLastLocation().getLatitude() + "," + MapsActivity.getmLastLocation().getLongitude());
+            stringBuilder.append("&radius=500");
+            stringBuilder.append("&key=" + API_KEY);
 
             URL url = new URL(stringBuilder.toString());
             httpURLConnection = (HttpURLConnection) url.openConnection();

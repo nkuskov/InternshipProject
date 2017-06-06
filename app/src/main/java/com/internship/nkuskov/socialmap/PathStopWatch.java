@@ -7,8 +7,6 @@ import android.os.Message;
 
 import com.google.android.gms.location.places.Place;
 
-import java.text.DecimalFormat;
-
 /**
  * Created by nkuskov on 5/3/2017.
  */
@@ -105,14 +103,14 @@ public class PathStopWatch extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         do {
-            distance = startLocation.distanceTo(mMapsActivity.mLastLocation);
+            distance = startLocation.distanceTo(mMapsActivity.getmLastLocation());
             if (isCancelled()) {
                 return null;
             }
         } while (distance <= 50.0f);
         mHandler.sendEmptyMessage(MSG_START_TIMER);
         do {
-            distance = stopLocation.distanceTo(mMapsActivity.mLastLocation);
+            distance = stopLocation.distanceTo(mMapsActivity.getmLastLocation());
             if (isCancelled()) {
                 return null;
             }

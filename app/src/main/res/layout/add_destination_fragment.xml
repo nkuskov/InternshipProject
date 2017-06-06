@@ -7,25 +7,18 @@
                 android:background="@color/blue_800"
                 android:gravity="center_horizontal">
 
-    <Button
-        android:id="@+id/close_fragment_btn"
+
+    <EditText
+        android:id="@+id/edTextFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:onClick="deleteAddDestionationFragmentButton"
-        android:text="delete"/>
-
-    <TextView
-        android:id="@+id/edTextFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/close_fragment_btn"
-        android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:text="Fragment"
-        android:textSize="25dp"/>
+        android:layout_marginTop="5dp"
+        android:hint="Введите место..."
+        android:ems="13"
+        android:textSize="15dp"/>
 
     <LinearLayout
         android:id="@+id/auto_complete_layout"
@@ -33,35 +26,43 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/edTextFragment"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="5dp"
         android:orientation="vertical">
 
         <AutoCompleteTextView
+            android:textSize="15dp"
             android:id="@+id/auto_complete_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:text="Please enter your place"/>
+            android:ems="13"
+            android:hint="Введите адрес..."/>
 
         <requestFocus/>
-
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/add_destination_fragment_btns_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/auto_complete_layout"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal">
 
-    <!--<LinearLayout-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_below="@+id/edTextFragment"-->
-    <!--android:layout_centerHorizontal="true">-->
+        <Button
+            android:id="@+id/add_new_destination_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add"/>
 
-    <!--<fragment-->
-    <!--android:id="@+id/place_autocomplete_fragment"-->
-    <!--android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="center"/>-->
+        <Button
+            android:id="@+id/close_fragment_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:text="cancel"/>
 
-    <!--</LinearLayout>-->
+    </LinearLayout>
 
 
 </RelativeLayout>

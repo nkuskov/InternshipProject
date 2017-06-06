@@ -68,7 +68,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     GoogleMap mMap;
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
-    static Location mLastLocation;
+    private static Location mLastLocation;
     Location sourceLocation;
     Location stopLocation;
     Marker mMarker;
@@ -127,6 +127,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public FragmentTransaction getmFragmentTransaction() {
         return mFragmentTransaction;
+    }
+
+    public static Location getmLastLocation(){
+        return mLastLocation;
     }
 
     @Override
