@@ -504,8 +504,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void initializeDestinationItems() {
         mDestinationItems = new ArrayList<>();
         mDestinationItems.add(new DestinationAddButton());
-        mDestinationItems.add(new DestinationItem("work", R.drawable.dest_icon_img));
-        mDestinationItems.add(new DestinationItem("home", R.drawable.dest_icon_img));
+        mDestinationItems.add(0, new DestinationItem("work", R.drawable.add_dest_btn));
+        mDestinationItems.add(0, new DestinationItem("home", R.drawable.add_dest_btn));
     }
 
 

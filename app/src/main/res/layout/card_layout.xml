@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:padding="2dp"
-        app:cardBackgroundColor="#83b9ff">
+        app:cardBackgroundColor="#0d47a1">
 
         <RelativeLayout
             android:layout_width="wrap_content"
