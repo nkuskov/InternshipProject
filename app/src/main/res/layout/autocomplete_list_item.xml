@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:textSize="20sp"/>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/predictedRow"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:background="#0d47a1"
+                android:gravity="center_vertical">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/location_pointer"
+        />
+
+    <TextView
+        android:id="@+id/address"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/image"
+        android:maxLines="1"
+        android:scrollbars="horizontal"
+        android:textColor="#a7c0cd"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/secondary_adress"
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:layout_below="@+id/address"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/image"
+        android:maxLines="1"
+        android:textColor="#78909c"
+        android:textSize="10sp"/>
+
+</RelativeLayout>
 
